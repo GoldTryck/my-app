@@ -1,17 +1,19 @@
 import * as React from 'react';
-import Header from './components/Header';
-import Carousel from './components/Carousel';
-import { Box } from '@mui/material';
+import Home from './components/Home';
+import About from './components/About';
+import Layout from './components/Layout';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 function App() {
   return (
-    <>
-      <Header />
-      <Box sx={{ padding: '20px' }}>
-        <h2>Escuela Particular 1</h2>
-      </Box>
-      <Carousel />
-    </>
+      <Router>
+        <Layout>
+          <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+        </Routes>
+        </Layout>
+      </Router>
   );
 }
 
