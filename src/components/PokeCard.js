@@ -16,7 +16,7 @@ const PokemonCard = ({item}) => {
               peso: {item.weight}
             </Typography>
             <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              tipo{item.types[0].type.name}
+              tipo: {item.types[0].type.name}
             </Typography>
           </CardContent>
         </CardActionArea>

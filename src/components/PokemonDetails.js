@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { getPokemonById, getEvolutionChain, getPokemonesFromEvolutionChain } from "../Utils/pokeUtils";
 import {
   Card,
   CardContent,
@@ -20,32 +21,29 @@ const PokemonDetails = () => {
       console.log("No ID found in URL params.");
       return;
     }
-
-    console.log(`Fetching data for Pokémon ID: ${id}`);
-
-    async function fetchData() {
+    async function loadPokemon(){
       try {
         setLoading(true);
         setError(null);
+        const data = await getPokemonById(id);
+        const evlutionChain = await getEvolutionChain(data.species.url);
+        const evolutions = await getPokemonesFromEvolutionChain(evlutionChain);
+        const pokemonWithEvolutions = {
+          ...data,
+          evolutions: evolutions.map((evolution) => ({
+            name: evolution.name,
+            sprites: evolution.sprites,
+          })),
+        };
 
-        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-        console.log(`Response status: ${response.status}`);
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const result = await response.json();
-        setPokemon(result);
-
-        console.log(pokemon);
-      } catch (error) {
-        setError(error.message);
+        setPokemon(pokemonWithEvolutions);
+      } catch (err) {
+        setError(err.message || "An error occurred while fetching data.");
       } finally {
         setLoading(false);
       }
     }
-
-    fetchData();
+    loadPokemon();
   }, [id]);
 
   if (loading) return <h1>Loading...</h1>;
@@ -95,7 +93,27 @@ return (
           <Typography gutterBottom variant="h5" component="div">
             Evoluciones
           </Typography>
-          
+
+          <Box
+            display="flex"
+            justifyContent="flex-start"
+            flexDirection="row"
+            overflow="auto"
+          >
+            {pokemon.evolutions.map((evolution, index) => (
+              <Box key={index} mr={2}>
+                <Typography variant="body2" color="text.primary">
+                  {evolution.name}
+                </Typography>
+                <CardMedia
+                  component="img"
+                  alt={evolution.name}
+                  image={evolution.sprites.front_default}
+                />
+              </Box>
+            ))}
+          </Box>
+
         </CardContent>
       </Card>
     </Grid2>
